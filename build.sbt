@@ -12,4 +12,6 @@ libraryDependencies += "com.typesafe.akka" % "akka-http-core_2.11" % "3.0.0-RC1"
 
 libraryDependencies += "com.typesafe.akka" % "akka-testkit_2.11" % "2.4.10"
 
+libraryDependencies += "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.10.0"
+
 parallelExecution in Test := false
