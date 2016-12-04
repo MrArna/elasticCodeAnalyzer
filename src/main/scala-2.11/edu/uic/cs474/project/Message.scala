@@ -8,6 +8,6 @@ import edu.uic.cs474.project.downloading.DiffData
 //A trait representing messages
 sealed trait Message
 
-case class GetCommitsDiffDataMap(repoPath: String, oldCommit: String, newCommit: String) extends Message
+case class GetCommitsDiffDataMap(repoPath: String, newCommit: String) extends Message
 
 case class SendCommitsDiffDataMap(diffDataMap: Map[(String, String), List[DiffData]]) extends Message

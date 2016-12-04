@@ -25,19 +25,41 @@ import scala.sys.process.Process
 class ProjectVersionManager extends Actor {
 
   override def receive: Receive = {
-    case GetCommitsDiffDataMap(repoPath, oldCommit, newCommit) =>
-      sender ! SendCommitsDiffDataMap(getDiffDataList(repoPath, oldCommit, newCommit))
+    case GetCommitsDiffDataMap(repoPath, newCommit) =>
+      sender ! SendCommitsDiffDataMap(getDiffDataMap(repoPath, newCommit))
+  }
+
+  /**
+    *
+    * @param repo a jgit repo
+    * @param newCommit an hash commit
+    * @return the hash commit of the previous commit wrt to the passed one, in the passed repo
+    */
+  def getPreviousCommit(repo: Repository, newCommit: String): String = {
+    val git: Git = new Git(repo)
+    git.log()
+      .call()
+      .asScala
+      .toList
+      .map(rev => rev.getName)
+      .sliding(2)
+      .collectFirst{
+        //I need the backtick ` to actually match against newCommit value
+        //see http://stackoverflow.com/questions/7905023/in-scala-pattern-matching-what-is-suspicious-shadowing-by-a-variable-pattern
+        //in the sliding window, the new commit is before the old one since the log order is reverse chronological
+        case List(`newCommit`, previousCommit) => previousCommit}
+      .getOrElse(throw new IllegalArgumentException("Commit hash not found in the local repository"))
   }
 
   /**
     *
     * @param path path to the repository
-    * @param oldCommit old commit hash
     * @param newCommit new commit hash
     * @return a map with (oldPath, newPath) as key and List[DiffData] as value
     */
-  def getDiffDataList(path: String, oldCommit: String, newCommit: String): Map[(String, String), List[DiffData]] = {
+  def getDiffDataMap(path: String, newCommit: String): Map[(String, String), List[DiffData]] = {
     val repo: Repository = getRepoFromPath(path)
+    val oldCommit: String = getPreviousCommit(repo, newCommit)
     val formatter: DiffFormatter = customDiffFormatter(repo)
     val diffData = getDiffEntries(formatter, repo, oldCommit, newCommit)
       .map(diffEntry =>
