@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.project.downloading.ProjectDownloader.{PrivateRepoFound, Start}
+import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, PrivateRepoFound, Start}
 import org.json4s.JsonAST.{JArray, JBool, JInt}
 import org.json4s.{DefaultFormats, JString, JValue}
 import org.json4s.jackson._
@@ -75,6 +75,8 @@ class ProjectDownloader extends Actor with ActorLogging {
     var counter = 0
     var oldRepo = ""
     var newRepo = ""
+    var privatRepo = false
+    var repoId:BigInt = 0
 
     //create tmp directory if not exists
     val currentDirectory = new java.io.File(".").getCanonicalPath
@@ -100,39 +102,35 @@ class ProjectDownloader extends Actor with ActorLogging {
             oldRepo = newRepo
             counter += 1
             if(counter > numOfProjects) break;
+
+            val repoJson = parseJson(request(oldRepo))
+
+            if((repoJson \ "private").asInstanceOf[JBool].value)
+            {
+              privatRepo = true
+            }
+            else
+            {
+              privatRepo = false
+              repoId = (repoJson \ "id").asInstanceOf[JInt].num
+              "git clone " + (repoJson \ "clone_url").asInstanceOf[JString].s + " tmp/" + repoId !;
+            }
           }
-          val title = (item \ "title").asInstanceOf[JString].s
-          val body = (item \ "body").asInstanceOf[JString].s
-          println(prettyJson(item))
-
-
-          val repoJson = parseJson(request(oldRepo))
-
-          if((repoJson \ "private").asInstanceOf[JBool].value)
+          if(!privatRepo)
           {
-            sender ! PrivateRepoFound
-          }
-          else
-          {
-            val repoId = (repoJson \ "id").asInstanceOf[JInt].num
-            "git clone " + (item \ "clone_url").asInstanceOf[JString].s + " tmp/" + repoId !;
+            val title = (item \ "title").asInstanceOf[JString].s
+            val body = (item \ "body").asInstanceOf[JString].s
+            val eventsJson = parseJson(request((item \ "events_url").asInstanceOf[JString].s))
+            for(event <- eventsJson.asInstanceOf[JArray].arr)
+            {
+              if((event \ "event").asInstanceOf[JString].s.equals("closed"))
+              {
+                val commitSHA = (event \ "commit_id").asInstanceOf[JString].s
+                sender ! GetIssue(repoId,title,body,commitSHA)
+              }
+            }
           }
 
-
-
-          /*if((item \ "private").asInstanceOf[JBool].value)
-          {
-            sender ! PrivateRepoFound
-          }
-          else
-          {
-            val repoId = (item \ "id").asInstanceOf[JInt].num
-            val owner = (item \ "owner" \ "id").asInstanceOf[JInt].num
-            val issueListJson = parseJson(request("https://api.github.com/repos/"+ owner + "/" + repoId + "/issues"))
-            println(issueListJson)
-
-            //"git clone " + (item \ "clone_url").asInstanceOf[JString].s + " tmp/" + repoId !;
-          }*/
         }
       }
     }
@@ -154,7 +152,7 @@ object ProjectDownloader
 
   trait Send
   case object PrivateRepoFound extends Send
-  case class DownloadedRepo(id: Int,path:String,issues: List[(String,String)]) extends Send
+  case class GetIssue(repoId:BigInt,issueTitle:String,issueBody:String,commitId:String) extends Send
 
 
   def props():Props = Props(new ProjectDownloader)
