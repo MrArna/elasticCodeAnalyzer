@@ -5,10 +5,20 @@ import org.eclipse.jdt.core.dom.CompilationUnit
 import scala.collection.mutable.HashMap
 
 /**
-  * Created by andrea on 04/12/16.
+  * Class to generate a single sample in the dataset.
+  * @param before The parsed code before it was changed.
+  * @param beforeStart The starting char of the changed region in the original file.
+  * @param beforeEnd The ending char of the changed region in the original file.
+  * @param after The parsed code after it was changed.
+  * @param afterStart The starting char of the changed region in the changed file.
+  * @param afterEnd The ending char of the changed region in the changed file.
   */
 class SampleGenerator(before:CompilationUnit,beforeStart:Int,beforeEnd:Int,after:CompilationUnit,afterStart:Int,afterEnd:Int) {
 
+  /**
+    * Generate the sample.
+    * @return A string with the generated sample.
+    */
   def generate() : String = {
 
     var sample = ""
@@ -29,7 +39,7 @@ class SampleGenerator(before:CompilationUnit,beforeStart:Int,beforeEnd:Int,after
       sample += afterVisitor.features.getOrElse(name,"0") + ","
     })
 
-    sample.substring(0,sample.length-2)
+    sample.substring(0,sample.length-1)
   }
 
 }
@@ -37,6 +47,7 @@ class SampleGenerator(before:CompilationUnit,beforeStart:Int,beforeEnd:Int,after
 object SampleGenerator {
 
 
+  //The feature names
   private val names = Array("CatchClause","ArrayAccess","ArrayCreation","Assignment","BooleanLiteral",
     "CastExpression","CharacterLiteral","ClassInstanceCreation","ConditionalExpression","CreationReference",
     "ExpressionMethodReference","FieldAccess","InstanceofExpression","LambdaExpression","MethodInvocation",
@@ -49,6 +60,7 @@ object SampleGenerator {
     "SimpleType","QualifiedType","WildcardType","ParameterizedType","TypeParameter",
     "*","/","%","+","-","<<",">>",">>>","<",">","<=",">=","==","!=","^","&","|","&&","||","++","--","!","~")
 
+  //Feature renamings
   private val renaming = new HashMap[String,String]
   renaming("*") = "TIMES"
   renaming("/") = "DIVIDE"
@@ -74,6 +86,7 @@ object SampleGenerator {
   renaming("!") = "NOT"
   renaming("~") = "COMPLEMENT"
 
+  //Generate the CSV file header with feature names
   def getHeader() : String = {
 
     var header = ""
@@ -88,6 +101,6 @@ object SampleGenerator {
       header += SampleGenerator.renaming.getOrElse(name,name) + "_A,"
     })
 
-    header.substring(0,header.length-2)
+    header.substring(0,header.length-1)
   }
 }

@@ -27,7 +27,7 @@ class CodeParser(path:String,startLine:Int,endLine:Int) {
     //Initialize the scanner
     val scanner = new Scanner(new File(path))
     var code = ""
-    var lines = 0
+    var lines = 1
     var startChar = 0
     var endChar = 0
 
@@ -37,10 +37,12 @@ class CodeParser(path:String,startLine:Int,endLine:Int) {
       //Check whether we reached the start/end line
       if(lines == startLine)
         startChar = code.length
+
+      code = code + scanner.nextLine() + "\n"
+
       if(lines == endLine)
         endChar = code.length
 
-      code = code + "\n" + scanner.nextLine()
       lines += 1
     }
 

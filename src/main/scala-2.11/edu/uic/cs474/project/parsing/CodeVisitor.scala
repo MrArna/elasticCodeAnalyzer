@@ -5,12 +5,16 @@ import org.eclipse.jdt.core.dom._
 import scala.collection.mutable.HashMap
 
 /**
-  * Created by andrea on 02/12/16.
+  * An ASTVisitor to visit the nodes of an AST.
+  * This class collects features regarding the specified portion of code while the AST is being visited.
+  * @param startChar The initial character of the region of interest.
+  * @param endChar The final character of the region of interest.
   */
 class CodeVisitor(startChar:Int,endChar:Int) extends ASTVisitor {
 
   val features = new HashMap[String,Int]
 
+  //Selects only the features whose range overlaps with the specified region
   private def filter(name:String,start:Int,end:Int) : Boolean = {
 
     if(start >= startChar && start <= endChar || end <= endChar && end >= startChar) {

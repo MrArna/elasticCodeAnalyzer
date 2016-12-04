@@ -14,4 +14,6 @@ libraryDependencies += "com.typesafe.akka" % "akka-testkit_2.11" % "2.4.10"
 
 libraryDependencies += "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.10.0"
 
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+
 parallelExecution in Test := false
