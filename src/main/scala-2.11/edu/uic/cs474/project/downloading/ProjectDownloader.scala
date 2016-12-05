@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, PrivateRepoFound, Start}
+import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, IssueClosedWithoutCommit, PrivateRepoFound, Start}
 import org.json4s.JsonAST.{JArray, JBool, JInt}
 import org.json4s.{DefaultFormats, JString, JValue}
 import org.json4s.jackson._
@@ -39,10 +39,12 @@ class ProjectDownloader extends Actor with ActorLogging {
     //initialize the HTTP request
     val userData = ByteString("abc")
 
+    val auth = if(userUri.contains("?")) "&client_id=e2fecab74cfe360f9bff&client_secret=ad9a46c26f8ccf20e1e5e32b13e5a8c9a73eb2f1" else "?client_id=e2fecab74cfe360f9bff&client_secret=ad9a46c26f8ccf20e1e5e32b13e5a8c9a73eb2f1"
+
     val request:HttpRequest=
       HttpRequest(
         GET,
-        uri = userUri
+        uri = userUri + auth
       )
 
     //make the request
@@ -125,8 +127,15 @@ class ProjectDownloader extends Actor with ActorLogging {
             {
               if((event \ "event").asInstanceOf[JString].s.equals("closed"))
               {
-                val commitSHA = (event \ "commit_id").asInstanceOf[JString].s
-                sender ! GetIssue(repoId,title,body,commitSHA)
+                if((event \ "commit_id").isInstanceOf[JString])
+                {
+                  val commitSHA = (event \ "commit_id").asInstanceOf[JString].s
+                  sender ! GetIssue(repoId,title,body,commitSHA)
+                }
+                else
+                {
+                  sender ! IssueClosedWithoutCommit(repoId,title,body)
+                }
               }
             }
           }
@@ -151,8 +160,8 @@ object ProjectDownloader
   case class Start(numOfProject: Int,lang:String) extends Receive
 
   trait Send
-  case object PrivateRepoFound extends Send
   case class GetIssue(repoId:BigInt,issueTitle:String,issueBody:String,commitId:String) extends Send
+  case class IssueClosedWithoutCommit(repoId:BigInt,issueTitle:String,issueBody:String) extends Send
 
 
   def props():Props = Props(new ProjectDownloader)
