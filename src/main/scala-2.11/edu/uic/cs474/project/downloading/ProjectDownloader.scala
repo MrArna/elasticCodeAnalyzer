@@ -29,12 +29,20 @@ class ProjectDownloader extends Actor with ActorLogging {
   val http = Http(context.system)
 
 
+  /**
+    * This function create a request and obtain its response
+    *
+    * @param userUri the uri at which sending the request
+    * @return the resquest in string format
+    */
   private def request(userUri: String): String = {
     val http = Http(context.system)
     import HttpMethods._
     //initialize the HTTP request
     val userData = ByteString("abc")
 
+
+    //enrich with oauth credentials
     val auth = if(userUri.contains("?")) "&client_id=e2fecab74cfe360f9bff&client_secret=ad9a46c26f8ccf20e1e5e32b13e5a8c9a73eb2f1" else "?client_id=e2fecab74cfe360f9bff&client_secret=ad9a46c26f8ccf20e1e5e32b13e5a8c9a73eb2f1"
 
     val request:HttpRequest=
@@ -66,7 +74,12 @@ class ProjectDownloader extends Actor with ActorLogging {
   }
 
 
-
+  /**
+    * This method downloads projects from the issued project list
+    *
+    * @param numOfProjects number of project to download
+    * @param lang the language of the project
+    */
   def download(numOfProjects: Int, lang: String) = {
 
 
@@ -92,6 +105,7 @@ class ProjectDownloader extends Actor with ActorLogging {
 
       breakable
       {
+        //for each issue
         for(item <- (json \ "items").asInstanceOf[JArray].arr)
         {
           newRepo = (item \ "repository_url").asInstanceOf[JString].s
