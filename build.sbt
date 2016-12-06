@@ -37,3 +37,5 @@ libraryDependencies += "commons-io" % "commons-io" % "2.5"
 parallelExecution in Test := false
 
 //mainClass in assembly := Some("edu.uic.cs474.hw3.Main")
+libraryDependencies += "org.eclipse.jdt" % "org.eclipse.jdt.core" % "3.10.0"
+
