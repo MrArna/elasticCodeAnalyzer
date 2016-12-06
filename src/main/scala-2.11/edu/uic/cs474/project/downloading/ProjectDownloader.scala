@@ -119,6 +119,8 @@ class ProjectDownloader extends Actor with ActorLogging {
               }
 
             val repoJson = parseJson(request(oldRepo))
+            repoId = (repoJson \ "id").asInstanceOf[JInt].num
+            "git clone " + (repoJson \ "clone_url").asInstanceOf[JString].s + " tmp/" + repoId !;
 
             if((repoJson \ "private").asInstanceOf[JBool].value)
             {
@@ -127,14 +129,14 @@ class ProjectDownloader extends Actor with ActorLogging {
             else
             {
               privatRepo = false
-              repoId = (repoJson \ "id").asInstanceOf[JInt].num
-              "git clone " + (repoJson \ "clone_url").asInstanceOf[JString].s + " tmp/" + repoId !;
             }
           }
           if(!privatRepo)
           {
-            val title = (item \ "title").asInstanceOf[JString].s
-            val body = (item \ "body").asInstanceOf[JString].s
+            var title = ""
+            var body = ""
+            if((item \ "title").isInstanceOf[JString]) title = (item \ "title").asInstanceOf[JString].s
+            if((item \ "body").isInstanceOf[JString]) body = (item \ "body").asInstanceOf[JString].s
             val eventsJson = parseJson(request((item \ "events_url").asInstanceOf[JString].s))
             for(event <- eventsJson.asInstanceOf[JArray].arr)
             {
