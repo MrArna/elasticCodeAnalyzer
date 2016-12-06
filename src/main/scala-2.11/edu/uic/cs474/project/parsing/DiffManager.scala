@@ -1,6 +1,6 @@
 package edu.uic.cs474.project.parsing
 
-import akka.actor.Actor
+import akka.actor.{Actor, Props}
 import edu.uic.cs474.project.Config
 import edu.uic.cs474.project.diffing.ProjectDiffManager
 
@@ -42,4 +42,8 @@ object DiffManager {
 
   //Send messages
   trait Send
+
+
+  def props():Props = Props(new DiffManager())
+
 }

@@ -59,6 +59,8 @@ class DatasetGenerator {
 
     writer.close()
 
+    println("Saved batch of " + samples.size + " samples")
+
     samples.clear()
   }
 }

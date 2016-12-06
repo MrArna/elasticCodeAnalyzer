@@ -9,9 +9,6 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-/**
-  * Created by Marco on 23/10/16.
-  */
 class ProjectDownloaderTest extends TestKit(ActorSystem("DownloadTest",ConfigFactory.parseString(TestKitUsageSpec.config)))
   with DefaultTimeout
   with ImplicitSender
