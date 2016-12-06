@@ -22,18 +22,29 @@ class ProjectDiffManager extends Actor {
 
   override def receive: Receive = {
     case GetCommitsDiffDataMap(repoPath, newCommit) =>
-      sender ! SendCommitsDiffDataMap(getDiffDataMap(repoPath, newCommit))
+      sender ! SendCommitsDiffDataMap(ProjectDiffManager.getDiffDataMap(repoPath, newCommit))
   }
+}
+
+object ProjectDiffManager {
+
+  trait Receive
+  case class GetCommitsDiffDataMap(repoPath: String, newCommit: String) extends Receive
+
+  trait Send
+  case class SendCommitsDiffDataMap(diffDataMap: Map[(String, String), List[DiffData]]) extends Send
+
+  def props():Props = Props(new ProjectDiffManager)
 
   /**
     *
-    * @param repo a jgit repo
+    * @param repoPath repository path
     * @param newCommit an hash commit
     * @return the hash commit of the previous commit wrt to the passed one, in the passed repo
     */
-  def getPreviousCommit(repo: Repository, newCommit: String): String = {
-    val git: Git = new Git(repo)
-    git.log()
+  def getPreviousCommit(repoPath: String, newCommit: String): String = {
+    Git.open(new File(repoPath))
+      .log()
       .call()
       .asScala
       .toList
@@ -49,13 +60,24 @@ class ProjectDiffManager extends Actor {
 
   /**
     *
+    * @param path full path to the repository
+    * @return a jgit repository object
+    */
+  def getRepoFromPath(path: String): Repository = {
+    var builder: FileRepositoryBuilder = new FileRepositoryBuilder()
+    val file: File = new File(path)
+    builder.setGitDir(file).build()
+  }
+
+  /**
+    *
     * @param path path to the repository
     * @param newCommit new commit hash
     * @return a map with (oldPath, newPath) as key and List[DiffData] as value
     */
   def getDiffDataMap(path: String, newCommit: String): Map[(String, String), List[DiffData]] = {
     val repo: Repository = getRepoFromPath(path)
-    val oldCommit: String = getPreviousCommit(repo, newCommit)
+    val oldCommit: String = getPreviousCommit(path, newCommit)
     val formatter: DiffFormatter = customDiffFormatter(repo)
     val diffData = getDiffEntries(formatter, repo, oldCommit, newCommit)
       .map(diffEntry =>
@@ -73,7 +95,7 @@ class ProjectDiffManager extends Actor {
               edit.getBeginB + 1,
               edit.getEndA + 1,
               edit.getEndB + 1))))
-        .toMap
+      .toMap
     formatter.close()
     diffData
   }
@@ -106,20 +128,6 @@ class ProjectDiffManager extends Actor {
 
   /**
     *
-    * @param path full path to the repository
-    * @return a jgit repository object
-    */
-  def getRepoFromPath(path: String): Repository = {
-    var builder: FileRepositoryBuilder = new FileRepositoryBuilder()
-    val file: File = new File(path)
-    builder.setGitDir(file)
-      .readEnvironment()
-      .findGitDir()
-      .build()
-  }
-
-  /**
-    *
     * @param repo a jgit repository
     * @param objectId the commit hash whose tree has to be parsed
     * @return a jgit tree parser for the specified commit
@@ -134,15 +142,4 @@ class ProjectDiffManager extends Actor {
     walk.dispose()
     treeParser
   }
-}
-
-object ProjectDiffManager {
-
-  trait Receive
-  case class GetCommitsDiffDataMap(repoPath: String, newCommit: String) extends Receive
-
-  trait Send
-  case class SendCommitsDiffDataMap(diffDataMap: Map[(String, String), List[DiffData]]) extends Send
-
-  def props():Props = Props(new ProjectDiffManager)
 }

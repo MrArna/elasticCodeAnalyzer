@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, IssueClosedWithoutCommit, PrivateRepoFound, Start}
+import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, IssueClosedWithoutCommit, Start}
 import org.json4s.JsonAST.{JArray, JBool, JInt}
 import org.json4s.{DefaultFormats, JString, JValue}
 import org.json4s.jackson._
