@@ -88,7 +88,7 @@ class ProjectDownloader extends Actor with ActorLogging {
     for(i <- 1 to (numOfProjects/101)+1)
     {
       //response into  json
-      val json = parseJson(request("https://api.github.com/search/issues?q=label:bug+language:"+ lang +"+state:closed&sort=created&order=desc&page="+ i +"&per_page=100"))
+      val json = parseJson(request("https://api.github.com/search/issues?q=label:bug+language:"+ lang +"+state:closed&sort=created&order=asc&page="+ i +"&per_page=100"))
 
       breakable
       {
@@ -129,12 +129,12 @@ class ProjectDownloader extends Actor with ActorLogging {
                 if((event \ "commit_id").isInstanceOf[JString])
                 {
                   val commitSHA = (event \ "commit_id").asInstanceOf[JString].s
-                  println("[DEBUG_DOWNLOADER] Message sent -> "  + GetIssue(repoId,title,body,commitSHA))
+                  println("[DEBUG_DOWNLOADER] Message sent -> "  + GetIssue(repoId,"","",commitSHA))
                   sender ! GetIssue(repoId,title,body,commitSHA)
                 }
                 else
                 {
-                  println("[DEBUG_DOWNLOADER] Message sent -> "  + IssueClosedWithoutCommit(repoId,title,body))
+                  println("[DEBUG_DOWNLOADER] Message sent -> "  + IssueClosedWithoutCommit(repoId,"",""))
 
                   sender ! IssueClosedWithoutCommit(repoId,title,body)
 
