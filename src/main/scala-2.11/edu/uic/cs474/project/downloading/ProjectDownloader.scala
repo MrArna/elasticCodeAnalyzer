@@ -11,6 +11,7 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
 import edu.uic.cs474.project.Config
 import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, IssueClosedWithoutCommit, Start}
+import edu.uic.cs474.project.parsing.DiffManager.Stop
 import org.json4s.JsonAST.{JArray, JBool, JInt}
 import org.json4s.{DefaultFormats, JString, JValue}
 import org.json4s.jackson._
@@ -99,7 +100,10 @@ class ProjectDownloader extends Actor with ActorLogging {
           {
             oldRepo = newRepo
             counter += 1
-            if(counter > numOfProjects) break;
+            if(counter > numOfProjects)
+              {
+                break
+              }
 
             val repoJson = parseJson(request(oldRepo))
 

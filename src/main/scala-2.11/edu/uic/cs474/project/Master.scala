@@ -6,7 +6,9 @@ import edu.uic.cs474.project.Master.Init
 import edu.uic.cs474.project.diffing.ProjectDiffManager
 import edu.uic.cs474.project.diffing.ProjectDiffManager.{GetCommitsDiffDataMap, SendCommitsDiffDataMap}
 import edu.uic.cs474.project.downloading.ProjectDownloader
-import edu.uic.cs474.project.downloading.ProjectDownloader.GetIssue
+import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, Start}
+import edu.uic.cs474.project.parsing.DiffManager
+import edu.uic.cs474.project.parsing.DiffManager.Stop
 
 /**
   * Created by andrea on 02/12/16.
@@ -27,9 +29,10 @@ class Master(downloaders: Int, differs: Int, parsers: Int) extends Actor {
       differssRouter = context.actorOf(
         ProjectDiffManager.props().withRouter(RoundRobinPool(differs)), name = "differsPool")
 
-      //TODO fix props
       parsersRouter = context.actorOf(
-        ProjectDownloader.props().withRouter(RoundRobinPool(downloaders)), name = "parsersPool")
+        DiffManager.props().withRouter(RoundRobinPool(parsers)), name = "parsersPool")
+
+      downloadersRouter ! Start(Config.numProject,Config.language)
     }
 
     case GetIssue(repoId,title,body,commitSHA) => {

@@ -12,4 +12,12 @@ object Config {
   val tempFolder:String = "tmp"
   //The path of the dataset to be generated
   var datasetPath:String = "files/dataset.csv"
+
+  val numProject:Int = 1000
+
+  val numDownloaders = 1
+  val numParsers = 1
+  val numDiffers = 1
+
+
 }
