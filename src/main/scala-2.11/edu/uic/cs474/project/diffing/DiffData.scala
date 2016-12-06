@@ -1,4 +1,4 @@
-package edu.uic.cs474.project.downloading
+package edu.uic.cs474.project.diffing
 
 import org.eclipse.jgit.diff.Edit
 
