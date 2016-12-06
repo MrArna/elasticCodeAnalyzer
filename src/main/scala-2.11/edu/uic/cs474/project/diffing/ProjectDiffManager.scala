@@ -133,8 +133,10 @@ object ProjectDiffManager {
     * @return a jgit tree parser for the specified commit
     */
   def prepareTreeParser(repo: Repository, objectId: String): AbstractTreeIterator = {
+    println(repo)
     val walk: RevWalk = new RevWalk(repo)
-    val commit: RevCommit = walk.parseCommit(ObjectId.fromString(objectId))
+    val commitObjectId = repo.resolve(objectId)
+    val commit: RevCommit = walk.parseCommit(commitObjectId)
     val tree: RevTree = walk.parseTree(commit.getTree.getId)
     val treeParser: CanonicalTreeParser = new CanonicalTreeParser()
     val reader: ObjectReader = repo.newObjectReader()
