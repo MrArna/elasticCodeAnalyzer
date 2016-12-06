@@ -88,7 +88,7 @@ class ProjectDownloader extends Actor with ActorLogging {
     for(i <- 1 to (numOfProjects/101)+1)
     {
       //response into  json
-      val json = parseJson(request("https://api.github.com/search/issues?q=label:bug+language:"+ lang +"+state:closed&sort=created&order=asc&page="+ i +"&per_page=100"))
+      val json = parseJson(request("https://api.github.com/search/issues?q=label:bug+language:"+ lang +"+state:closed&sort=created&order=desc&page="+ i +"&per_page=100"))
 
       breakable
       {
