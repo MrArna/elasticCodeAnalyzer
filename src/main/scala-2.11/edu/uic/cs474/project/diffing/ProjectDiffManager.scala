@@ -121,7 +121,7 @@ object ProjectDiffManager {
   def customDiffFormatter(repo: Repository): DiffFormatter = {
     val disabledOutputStream : OutputStream  = DisabledOutputStream.INSTANCE
     val formatter: DiffFormatter = new DiffFormatter(disabledOutputStream)
-    formatter.setDetectRenames(true)
+    //formatter.setDetectRenames(true)
     formatter.setRepository(repo)
     formatter
   }
