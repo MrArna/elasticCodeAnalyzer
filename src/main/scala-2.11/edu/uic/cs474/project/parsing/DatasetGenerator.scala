@@ -42,10 +42,13 @@ class DatasetGenerator {
     */
   def saveDataset(path:String): Unit = {
 
-    val writer = if(first) new PrintWriter(new File(path))
-    else new PrintWriter(new FileOutputStream(new File((path)),true))
+    val file = new File(path)
+    val exist = file.exists()
 
-    if(first) {
+    val writer = if(first && !exist) new PrintWriter(file)
+    else new PrintWriter(new FileOutputStream(file,true))
+
+    if(first && !exist) {
       val header = SampleGenerator.getHeader()
       writer.println(header)
     }
