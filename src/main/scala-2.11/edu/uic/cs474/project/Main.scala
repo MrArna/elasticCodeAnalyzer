@@ -1,5 +1,7 @@
 package edu.uic.cs474.project
 
+import akka.actor.ActorSystem
+import edu.uic.cs474.project.Master.Init
 import edu.uic.cs474.project.parsing.{CodeParser, CodeVisitor}
 
 /**
@@ -7,7 +9,12 @@ import edu.uic.cs474.project.parsing.{CodeParser, CodeVisitor}
   */
 object Main extends App {
 
-  println("Hello World")
+
+  val system = ActorSystem("GithubAnalyzer")
+  val master =system.actorOf (Master.props())
+
+  master ! Init
+
 
   /*val cp = new CodeParser("/home/andrea/workspace/HW1/src/main/java/edu/uic/cs474/hw1/parsing/ProjectParser.java",1,10)
   val cu = cp.parse()
