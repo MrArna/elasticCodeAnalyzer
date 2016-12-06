@@ -9,4 +9,6 @@ object Config {
   private var language:String = _
   //The folder where downloaded and temporary files should be created
   private var tempFolder:String = _
+  //The path of the dataset to be generated
+  var datasetPath:String = "files/dataset.csv"
 }
