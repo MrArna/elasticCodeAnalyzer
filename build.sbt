@@ -4,8 +4,6 @@ version := "1.0"
 
 scalaVersion := "2.11.8"
 
-scalaVersion := "2.11.8"
-
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit

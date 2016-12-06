@@ -7,5 +7,7 @@ import akka.actor.Actor
   */
 class Master extends Actor {
 
-  def receive = ???
+  /*def receive: Unit = {
+
+  }*/
 }
