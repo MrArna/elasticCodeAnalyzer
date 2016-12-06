@@ -65,7 +65,7 @@ object ProjectDiffManager {
     */
   def getRepoFromPath(path: String): Repository = {
     var builder: FileRepositoryBuilder = new FileRepositoryBuilder()
-    val file: File = new File(path)
+    val file: File = new File(path.concat("/.git"))
     builder.setGitDir(file).build()
   }
 
