@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.RoundRobinPool
 import edu.uic.cs474.project.Master.Init
 import edu.uic.cs474.project.diffing.ProjectDiffManager
-import edu.uic.cs474.project.diffing.ProjectDiffManager.GetCommitsDiffDataMap
+import edu.uic.cs474.project.diffing.ProjectDiffManager.{GetCommitsDiffDataMap, SendCommitsDiffDataMap}
 import edu.uic.cs474.project.downloading.ProjectDownloader
 import edu.uic.cs474.project.downloading.ProjectDownloader.GetIssue
 
@@ -35,6 +35,10 @@ class Master(downloaders: Int, differs: Int, parsers: Int) extends Actor {
     case GetIssue(repoId,title,body,commitSHA) => {
       val currentDirectory = new java.io.File(".").getCanonicalPath
       differssRouter ! GetCommitsDiffDataMap(currentDirectory + Config.tempFolder + "/" + repoId,commitSHA)
+    }
+
+    case SendCommitsDiffDataMap(diffDataMap) => {
+      parsersRouter ! SendCommitsDiffDataMap(diffDataMap)
     }
   }
 }
