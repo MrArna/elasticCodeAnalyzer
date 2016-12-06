@@ -1,6 +1,6 @@
 package edu.uic.cs474.project.parsing
 
-import java.io.{File, PrintWriter}
+import java.io.{File, FileOutputStream, PrintWriter}
 
 import scala.collection.mutable
 
@@ -10,10 +10,12 @@ import scala.collection.mutable
 class DatasetGenerator {
 
   //The samples currently in the dataset
-  val samples = new mutable.ArrayBuffer[String]
+  private val samples = new mutable.ArrayBuffer[String]
+  private var first = true
 
   /**
     * Add a new sample to the dataset.
+    *
     * @param beforePath The path of the file before it was changed.
     * @param afterPath The path of the file after it is changed.
     * @param beforeStartLine The line where the modification starts in the original file.
@@ -34,15 +36,21 @@ class DatasetGenerator {
   }
 
   /**
-    * Save the dataset in CSV format on the specified file.
+    * Save the current samples in CSV format on the specified file.
+    *
     * @param path The path where to save the dataset.
     */
   def saveDataset(path:String): Unit = {
 
-    val writer = new PrintWriter(new File(path))
+    val writer = if(first) new PrintWriter(new File(path))
+    else new PrintWriter(new FileOutputStream(new File((path)),true))
 
-    val header = SampleGenerator.getHeader()
-    writer.println(header)
+    if(first) {
+      val header = SampleGenerator.getHeader()
+      writer.println(header)
+    }
+
+    first = false
 
     samples.foreach(sample => {
 
@@ -50,5 +58,9 @@ class DatasetGenerator {
     })
 
     writer.close()
+
+    println("Saved batch of " + samples.size + " samples")
+
+    samples.clear()
   }
 }

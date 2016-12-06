@@ -8,7 +8,6 @@ import edu.uic.cs474.project.diffing.ProjectDiffManager.{GetCommitsDiffDataMap, 
 import edu.uic.cs474.project.downloading.ProjectDownloader
 import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, Start}
 import edu.uic.cs474.project.parsing.DiffManager
-import edu.uic.cs474.project.parsing.DiffManager.Stop
 
 /**
   * Created by andrea on 02/12/16.

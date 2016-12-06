@@ -15,8 +15,8 @@ class TestDatasetGenerator extends FunSuite {
 
     dg.addSample("files/test/simple.java","files/test/simple.java",3,4,3,4)
     dg.addSample("files/test/simple.java","files/test/simple.java",3,4,3,4)
+    dg.saveDataset("files/test/dataset")
     dg.addSample("files/test/simple.java","files/test/simple.java",3,4,3,4)
-
     dg.saveDataset("files/test/dataset")
 
     val lines = Source.fromFile("files/test/dataset").getLines()

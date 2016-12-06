@@ -9,7 +9,7 @@ import edu.uic.cs474.project.parsing.{CodeParser, CodeVisitor}
   */
 object Main extends App {
 
-  print("Dataset creation started.....")
+  println("Dataset creation started.....")
 
   val system = ActorSystem("GithubAnalyzer")
   val master =system.actorOf (Master.props(Config.numDownloaders,Config.numDiffers,Config.numParsers))
