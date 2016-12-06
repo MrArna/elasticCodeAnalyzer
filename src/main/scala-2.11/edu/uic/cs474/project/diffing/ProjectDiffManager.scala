@@ -82,7 +82,7 @@ object ProjectDiffManager {
     val diffData = getDiffEntries(formatter, repo, oldCommit, newCommit)
       .map(diffEntry =>
         //key for the edit map made by tuple (oldPath, newPath), since a file can be renamed
-        ((diffEntry.getOldPath, diffEntry.getNewPath),
+        ((path.concat("/").concat(diffEntry.getOldPath), path.concat("/").concat(diffEntry.getNewPath)),
           //value for the map, a list of diffdata (with empty edits removed)
           formatter
             .toFileHeader(diffEntry)
