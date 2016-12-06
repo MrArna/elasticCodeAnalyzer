@@ -3,6 +3,7 @@ package edu.uic.cs474.project.diffing
 import java.io.{File, OutputStream}
 
 import akka.actor.{Actor, Props}
+import edu.uic.cs474.project.diffing.ProjectDiffManager.{GetCommitsDiffDataMap, SendCommitsDiffDataMap}
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.{DiffEntry, DiffFormatter, Edit}
 import org.eclipse.jgit.lib.{ObjectId, ObjectReader, Repository}
