@@ -1,7 +1,8 @@
 package edu.uic.cs474.project.parsing
 
 import akka.actor.Actor
-import edu.uic.cs474.project.{Config, SendCommitsDiffDataMap}
+import edu.uic.cs474.project.Config
+import edu.uic.cs474.project.diffing.ProjectDiffManager
 
 /**
   * Actor that receives parsed diffs and generates samples.
@@ -14,7 +15,7 @@ class DiffManager extends Actor {
   def receive = {
 
     //Receive a new list of diffs
-    case SendCommitsDiffDataMap(map) =>
+    case ProjectDiffManager.SendCommitsDiffDataMap(map) =>
 
       //Add each diff as a new sample
       map.foreach( x => {
