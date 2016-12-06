@@ -26,10 +26,11 @@ class DiffManager extends Actor {
         })
       })
 
+      generator.saveDataset(Config.datasetPath)
+
     //Stop the actor and save the dataset
     case DiffManager.Stop =>
 
-      generator.saveDataset(Config.datasetPath)
   }
 }
 
