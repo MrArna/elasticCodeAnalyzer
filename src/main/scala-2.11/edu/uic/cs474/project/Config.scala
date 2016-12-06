@@ -6,7 +6,18 @@ package edu.uic.cs474.project
 object Config {
 
   //The language that projects to be downloaded should be written in
-  private var language:String = _
+  var language:String = "Java"
+
   //The folder where downloaded and temporary files should be created
-  private var tempFolder:String = _
+  val tempFolder:String = "tmp"
+  //The path of the dataset to be generated
+  var datasetPath:String = "files/dataset.csv"
+
+  val numProject:Int = 1000
+
+  val numDownloaders = 1
+  val numParsers = 1
+  val numDiffers = 1
+
+
 }

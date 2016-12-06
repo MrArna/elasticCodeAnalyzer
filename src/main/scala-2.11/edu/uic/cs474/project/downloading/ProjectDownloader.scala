@@ -9,20 +9,16 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
+import edu.uic.cs474.project.Config
 import edu.uic.cs474.project.downloading.ProjectDownloader.{GetIssue, IssueClosedWithoutCommit, Start}
 import org.json4s.JsonAST.{JArray, JBool, JInt}
-import org.json4s.{DefaultFormats, JString, JValue}
 import org.json4s.jackson._
+import org.json4s.{DefaultFormats, JString}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.sys.process._
-import util.control.Breaks._
-
-/**
-  * Created by andrea on 23/10/16.
-  */
-
+import scala.util.control.Breaks._
 
 class ProjectDownloader extends Actor with ActorLogging {
 
@@ -82,7 +78,7 @@ class ProjectDownloader extends Actor with ActorLogging {
 
     //create tmp directory if not exists
     val currentDirectory = new java.io.File(".").getCanonicalPath
-    val tmpDir = new File(currentDirectory + "/tmp")
+    val tmpDir = new File(currentDirectory + "/" + Config.tempFolder)
 
     if(!tmpDir.exists())
     {
@@ -103,7 +99,10 @@ class ProjectDownloader extends Actor with ActorLogging {
           {
             oldRepo = newRepo
             counter += 1
-            if(counter > numOfProjects) break;
+            if(counter > numOfProjects)
+              {
+                break
+              }
 
             val repoJson = parseJson(request(oldRepo))
 
@@ -130,11 +129,15 @@ class ProjectDownloader extends Actor with ActorLogging {
                 if((event \ "commit_id").isInstanceOf[JString])
                 {
                   val commitSHA = (event \ "commit_id").asInstanceOf[JString].s
+                  println("[DEBUG_DOWNLOADER] Message sent -> "  + GetIssue(repoId,title,body,commitSHA))
                   sender ! GetIssue(repoId,title,body,commitSHA)
                 }
                 else
                 {
+                  println("[DEBUG_DOWNLOADER] Message sent -> "  + IssueClosedWithoutCommit(repoId,title,body))
+
                   sender ! IssueClosedWithoutCommit(repoId,title,body)
+
                 }
               }
             }
