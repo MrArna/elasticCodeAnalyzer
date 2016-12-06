@@ -5,11 +5,18 @@ import org.eclipse.jgit.diff.Edit
 /**
   * Created by Alessandro on 04/12/16.
   */
-class DiffData(diffDataType: DiffDataType,
-               oldStartingLine: Int,
-               newStartingLine: Int,
-               oldEndingLine: Int,
-               newEndingLine: Int)
+class DiffData(_diffDataType: DiffDataType,
+               _oldStartingLine: Int,
+               _newStartingLine: Int,
+               _oldEndingLine: Int,
+               _newEndingLine: Int) {
+
+  def diffDataType = _diffDataType
+  def oldStartingLine = _oldStartingLine
+  def newStartingLine = _newStartingLine
+  def oldEndingLine = _oldEndingLine
+  def newEndingLine = _newEndingLine
+}
 
 object DiffData {
   def matchDiffDataType(editType: Edit.Type): DiffDataType = editType match {
