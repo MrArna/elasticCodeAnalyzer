@@ -1,28 +1,23 @@
-package edu.uic.cs474.project.downloading
+package edu.uic.cs474.project.diffing
 
 import java.io.{File, OutputStream}
-import java.lang.Iterable
 
-import akka.actor.Actor
-import edu.uic.cs474.project.{GetCommitsDiffDataMap, SendCommitsDiffDataMap}
-import org.eclipse.jgit.annotations.NonNull
+import akka.actor.{Actor, Props}
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.diff.{DiffConfig, DiffEntry, DiffFormatter, Edit}
-import org.eclipse.jgit.lib.{Config, ObjectId, ObjectReader, Repository}
-import org.eclipse.jgit.revwalk.{FollowFilter, RevCommit, RevTree, RevWalk}
+import org.eclipse.jgit.diff.{DiffEntry, DiffFormatter, Edit}
+import org.eclipse.jgit.lib.{ObjectId, ObjectReader, Repository}
+import org.eclipse.jgit.revwalk.{RevCommit, RevTree, RevWalk}
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.treewalk.{AbstractTreeIterator, CanonicalTreeParser}
-import org.eclipse.jgit.util.io.{DisabledOutputStream, NullOutputStream}
-import sun.text.normalizer.Replaceable
+import org.eclipse.jgit.util.io.DisabledOutputStream
 
 import scala.collection.JavaConverters._
-import scala.sys.process.Process
 
 
 /**
   * Created by Alessandro on 30/10/16.
   */
-class ProjectVersionManager extends Actor {
+class ProjectDiffManager extends Actor {
 
   override def receive: Receive = {
     case GetCommitsDiffDataMap(repoPath, newCommit) =>
@@ -138,4 +133,15 @@ class ProjectVersionManager extends Actor {
     walk.dispose()
     treeParser
   }
+}
+
+object ProjectDiffManager {
+
+  trait Receive
+  case class GetCommitsDiffDataMap(repoPath: String, newCommit: String) extends Receive
+
+  trait Send
+  case class SendCommitsDiffDataMap(diffDataMap: Map[(String, String), List[DiffData]]) extends Send
+
+  def props():Props = Props(new ProjectDiffManager)
 }
