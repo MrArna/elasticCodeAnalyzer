@@ -35,7 +35,7 @@ class Master(downloaders: Int, differs: Int, parsers: Int) extends Actor {
 
     case GetIssue(repoId,title,body,commitSHA) => {
       val currentDirectory = new java.io.File(".").getCanonicalPath
-      differssRouter ! GetCommitsDiffDataMap(currentDirectory + Config.tempFolder + "/" + repoId,commitSHA)
+      differssRouter ! GetCommitsDiffDataMap(currentDirectory + "/"+ Config.tempFolder + "/" + repoId,commitSHA)
     }
 
     case SendCommitsDiffDataMap(diffDataMap) => {
