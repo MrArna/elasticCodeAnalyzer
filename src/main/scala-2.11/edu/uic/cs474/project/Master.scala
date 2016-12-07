@@ -30,16 +30,16 @@ class Master(downloaders: Int, differs: Int, parsers: Int) extends Actor {
       parsersRouter = context.actorOf(
         DiffManager.props().withRouter(RoundRobinPool(parsers)), name = "parsersPool")
 
-      downloadersRouter ! Start(Config.numProject,Config.language,Config.)
+      downloadersRouter ! Start(Config.numProject,Config.language,Config.shift)
     }
 
     case GetIssue(repoId,title,body,commitSHA) => {
       val currentDirectory = new java.io.File(".").getCanonicalPath
-      differssRouter ! GetCommitsDiffDataMap(currentDirectory + "/"+ Config.tempFolder + "/" + repoId,commitSHA)
+      differssRouter ! GetCommitsDiffDataMap(currentDirectory + "/"+ Config.tempFolder + "/" + repoId,commitSHA,title,body)
     }
 
-    case SendCommitsDiffDataMap(diffDataMap) => {
-      parsersRouter ! SendCommitsDiffDataMap(diffDataMap)
+    case SendCommitsDiffDataMap(diffDataMap,issueTitle,issueBody) => {
+      parsersRouter ! SendCommitsDiffDataMap(diffDataMap,issueTitle,issueBody)
     }
   }
 }

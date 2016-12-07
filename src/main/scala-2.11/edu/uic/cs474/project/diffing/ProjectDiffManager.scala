@@ -21,18 +21,18 @@ import scala.collection.JavaConverters._
 class ProjectDiffManager extends Actor {
 
   override def receive: Receive = {
-    case GetCommitsDiffDataMap(repoPath, newCommit) =>
-      sender ! SendCommitsDiffDataMap(ProjectDiffManager.getDiffDataMap(repoPath, newCommit))
+    case GetCommitsDiffDataMap(repoPath, newCommit,issueTitle,issueBody) =>
+      sender ! SendCommitsDiffDataMap(ProjectDiffManager.getDiffDataMap(repoPath, newCommit),issueTitle,issueBody)
   }
 }
 
 object ProjectDiffManager {
 
   trait Receive
-  case class GetCommitsDiffDataMap(repoPath: String, newCommit: String) extends Receive
+  case class GetCommitsDiffDataMap(repoPath: String, newCommit: String, issueTitle:String,issueBody:String) extends Receive
 
   trait Send
-  case class SendCommitsDiffDataMap(diffDataMap: Map[(String, String), List[DiffData]]) extends Send
+  case class SendCommitsDiffDataMap(diffDataMap: Map[(String, String), List[DiffData]],issueTitle:String,issueBody:String) extends Send
 
   def props():Props = Props(new ProjectDiffManager)
 
