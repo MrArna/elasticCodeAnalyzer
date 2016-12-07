@@ -16,6 +16,18 @@ class DiffData(_diffDataType: DiffDataType,
   def newStartingLine = _newStartingLine
   def oldEndingLine = _oldEndingLine
   def newEndingLine = _newEndingLine
+
+  override def equals(obj: scala.Any): Boolean = {
+    if (!obj.isInstanceOf[DiffData]) {
+      false
+    } else {
+      diffDataType == obj.asInstanceOf[DiffData].diffDataType &&
+      oldStartingLine == obj.asInstanceOf[DiffData].oldStartingLine &&
+      oldEndingLine == obj.asInstanceOf[DiffData].oldEndingLine &&
+      newStartingLine == obj.asInstanceOf[DiffData].newStartingLine &&
+      newEndingLine == obj.asInstanceOf[DiffData].newEndingLine
+    }
+  }
 }
 
 object DiffData {
