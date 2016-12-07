@@ -15,7 +15,7 @@ class DiffManager extends Actor {
   def receive = {
 
     //Receive a new list of diffs
-    case ProjectDiffManager.SendCommitsDiffDataMap(map,issueTitle,issueBody) =>
+    case ProjectDiffManager.SendCommitsDiffDataMap(repoId, map,issueTitle,issueBody) =>
 
       //Add each diff as a new sample
       map.foreach( x => {
