@@ -30,7 +30,7 @@ class Master(downloaders: Int, differs: Int, parsers: Int) extends Actor {
       parsersRouter = context.actorOf(
         DiffManager.props().withRouter(RoundRobinPool(parsers)), name = "parsersPool")
 
-      downloadersRouter ! Start(Config.numProject,Config.language)
+      downloadersRouter ! Start(Config.numProject,Config.language,Config.)
     }
 
     case GetIssue(repoId,title,body,commitSHA) => {

@@ -80,7 +80,7 @@ class ProjectDownloader extends Actor with ActorLogging {
     * @param numOfProjects number of project to download
     * @param lang the language of the project
     */
-  def download(numOfProjects: Int, lang: String) = {
+  def download(numOfProjects: Int, lang: String,shift:Int) = {
 
 
     var counter = 0
@@ -98,7 +98,7 @@ class ProjectDownloader extends Actor with ActorLogging {
       tmpDir.mkdir()
     }
 
-    for(i <- 1 to (numOfProjects/101)+1)
+    for(i <- (1+shift) to (numOfProjects/101)+1)
     {
       //response into  json
       val json = parseJson(request("https://api.github.com/search/issues?q=label:bug+language:"+ lang +"+state:closed&sort=created&order=desc&page="+ i +"&per_page=100"))
@@ -165,8 +165,8 @@ class ProjectDownloader extends Actor with ActorLogging {
   }
 
   def receive = {
-    case Start(numOfProject,lang) =>
-      download(numOfProject,lang)
+    case Start(numOfProject,lang,shift) =>
+      download(numOfProject,lang,shift)
   }
 
 }
@@ -176,7 +176,7 @@ object ProjectDownloader
 {
 
   trait Receive
-  case class Start(numOfProject: Int,lang:String) extends Receive
+  case class Start(numOfProject: Int,lang:String,shift:Int) extends Receive
 
   trait Send
   case class GetIssue(repoId:BigInt,issueTitle:String,issueBody:String,commitId:String) extends Send

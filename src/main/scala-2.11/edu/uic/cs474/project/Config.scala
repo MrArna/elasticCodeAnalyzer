@@ -15,6 +15,8 @@ object Config {
 
   val numProject:Int = 1000
 
+  val shift = 10
+
   val numDownloaders = 1
   val numParsers = 1
   val numDiffers = 1
