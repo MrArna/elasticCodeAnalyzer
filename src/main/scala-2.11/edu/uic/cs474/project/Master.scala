@@ -33,13 +33,13 @@ class Master(downloaders: Int, differs: Int, parsers: Int) extends Actor {
       downloadersRouter ! Start(Config.numProject,Config.language,Config.shift)
     }
 
-    case GetIssue(repoId,title,body,commitSHA) => {
+    case GetIssue(repoId, title, body, commitSHA) => {
       val currentDirectory = new java.io.File(".").getCanonicalPath
-      differssRouter ! GetCommitsDiffDataMap(currentDirectory + "/"+ Config.tempFolder + "/" + repoId,commitSHA,title,body)
+      differssRouter ! GetCommitsDiffDataMap(repoId, currentDirectory + "/"+ Config.tempFolder + "/" + repoId, commitSHA, title, body)
     }
 
-    case SendCommitsDiffDataMap(diffDataMap,issueTitle,issueBody) => {
-      parsersRouter ! SendCommitsDiffDataMap(diffDataMap,issueTitle,issueBody)
+    case SendCommitsDiffDataMap(repoId, diffDataMap, issueTitle, issueBody) => {
+      parsersRouter ! SendCommitsDiffDataMap(repoId, diffDataMap,issueTitle, issueBody)
     }
   }
 }
