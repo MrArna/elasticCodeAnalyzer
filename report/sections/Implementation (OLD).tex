@@ -1,0 +1,100 @@
+\section{System design and implementation}
+\label{sec:implementation}
+
+%\note{Qui iniziamo dicendo qual e' l'approccio proposto: andiamo ad implementare un ODA loop, che misura il consumo di potenza e setta un power cap con RAPL, prende degli hardware events di ogni dominio e decide come modificare l'allocazione delle risorse per massimizzare la metrica di performance che usiamo. FATTO}
+
+The proposed approach is based on the well-known \gls{ODA} loop structure. More in details:
+\begin{itemize}
+\item we are going to \emph{observe} the power consumption of the system and some hardware events of interest for each running domain, under the given power cap;
+\item the traced events will then be used as metrics of performance, in order to \emph{decide} which hardware configuration is the best for the current workload;
+\item finally, we \emph{act} and set the system to the the best configuration found, to maximize the performance under the power cap. 
+\end{itemize}
+
+\xempupil performs all these operation in Dom0, the privileged domain that can communicate with the underlying Xen hypervisor: this allows our tool to set domains configurations and access hardware features through specific system calls. 
+In this section, we present the design and the implementation of the three \gls{ODA} loop phases, describing the limitations faced while working in a virtualized environment. 
+
+
+\subsection{Observe}
+\fixme{review TeoF}
+\note{qui andiamo a dire che recuperiamo le IR; prendiamo quelle su una finestra temporale fissata, e abbiamo scelto quelle come metrica hardware di interesse perche' rappresentano meglio la quantita di istruzioni effettivamente arrivate in fondo alla pipeline del processore; potremmo anche pensare di supportare gli heartbeat in una implementazione futura} 
+The observe phase is needed in order to let the framework to take a decision. To do so it is necessary a way to gather the information.
+In \xempupil we decided to use, as performance metric, the number of instruction retired . This metric is available from the HPC. In order to expose this information to dom0 we use xempowermon. This tool is provided in dom0 and allows us to gather the number of instructions retired for each running domain over time. It also provides useful information as: the power consumed per domain and the physical CPU usage.
+All this data are stored in a log file, that is read during the observe. This step works as follow: given a time window -that can be defined- all the data inside this range are read and mediated in order to obtain information about the performance under the current configuration.
+
+
+
+
+
+%In the observe phase we needed to get information about: power consumption and domain performance.
+%In particular PUPiL gathers information about the power accessing the specific MSR registers. These are exposed to PUPiL by the operative system, since Xen is an hypervisor this exposure lacks. Furthermore in PUPiL each application collects its information about the performance in textual files and shares them with PUPiL. In Xen this sharing is not possible, since each domain is isolated from the others. 
+%The mentioned lacks in Xen are due to the fact that it is an hypervisor and inter domain sharing and hardware exposure are against the concepts at the base of virtualization.
+%\note{raccontare come tracciamo gli eventi; andiamo ad usare una versone custom di Xen, che ad ogni context switch traccia il numero di eventi contati; questo e' fatto per ogni core e per ogni dominio; andiamo poi a raggruppare queste informazioni in dom0, loggandole su un file per fornirle a XeMPUPiL per le sue decisioni;}
+
+\subsection{Decide}
+\fixme{review TeoF}
+\note{descrivere qui l'algoritmo di assegnamento dei core e vCPU/domains}
+\note{raccontiamo cosa e' cambiato qui, nella fase di decisione (se qualcosa e' cambiato)}.
+The decision rationale is more or less the same as PUPiL. The major changes are in how the metrics gathered are evaluated. In particular the evaluation criteria is based on the average instruction retired in a time window. During the time window the metrics are gathered in the by xempower by the mechanism presented early. Once the window is expired all the instructon retired information for the domain are sum up. An then averaged over the time window length. In this way we allow the domain behaviour to adapt at the new configuration before taking a new decision.
+In the decision step it is also chosen how the workload virtual resources will be mapped on the assigned physical one. In particular we decided to maintain this distribution as even as possible. For example given a workload with M virtual resources and an assignment of N < M physical resources, our algorithm will work as follow:
+\begin{equation}
+resourcesOn(i) = \left\lceil{\frac{M - \displaystyle\sum_{0<j<i} resourcesOn(j)}{N-i}}\right\rceil
+\end{equation}
+where i is a number between 0 and N-1.
+
+In this way the domain itself still believes to have the same amount of virtual resources, that we set to the maximum number of physical resources available; then, the hypervisor may assign it a smaller amount of physical ones, potentially causing more virtual ones to be time-multiplexed on the same core (if this is the outcome of the decision phase).
+
+\subsection{Act}
+The \emph{act} phase essentially consists in: 1) setting the chosen power cap and 2) actuating the selected resource configuration.
+
+On the one hand, we decided to implement the same hardware technique proposed by PUPiL to set the power cap, i.e., exploiting the Intel \gls{RAPL} interface. This provides a fast and strict response to power oscillations, harshly cutting the frequency and the voltage of the whole CPU socket, ignoring the performance of the applications actually running on the system.
+
+On the other hand, we had to support the \emph{knobs} made available by the hypervisor to assign resources to each domain. This second step allows a fine tuning of the resources to improve domains' performance, but it is of course slower than the hardware actuation in responding to power variations. 
+
+This is the reason why we use both the approaches to provide a fast response, still trying to find the best resource allocation to maximize the performance of each domain under the power cap.
+
+\subsubsection{Hardware power cap}
+A bare metal operating system can easily access the \gls{RAPL} interface to set a power cap on the system by writing data into the right \gls{MSR} of the processor. The two registers of interest to our purposes are \texttt{MSR\_RAPL\_POWER\_UNIT} and \texttt{MSR\_PKG\_RAPL\_POWER\_LIMIT}: the former contains processor-specific time, energy and power units, used to scale each value read or written on the \gls{RAPL} \gls{MSR}, in order to obtain a valid power or energy measure; the latter can be written to set a limit on the power consumption of the whole CPU socket.
+
+In a virtualized environment, these registers are not directly accessible by the virtual domains, even from the privileged tenant Dom0. However, this limitation can be overcome by invoking custom hypercalls that can directly access the underlying hardware. To the best of our knowledge, the Xen hypervisor does not natively support specific hypercalls to interact with the \gls{RAPL} interface: as a consequence, we implemented our custom hypercalls to this purpose. In order to be enough generic, we implemented two hypercalls: \texttt{"xempower\_rdmsr"} and \texttt{"xempower\_wrmsr}". The first one allows to reads, while the second one allows to writes a specified \gls{MSR} from Dom0. 
+
+Each hypercall needs to be declared inside the kernel of the hypervisor, that runs bare metal on the hardware. The kernel keeps track of the list of hypercalls available and the input parameters they accept. For each of them, a callback function has to be declared and implemented to be accessible by the kernel at runtime: our implementation makes use of two Xen build-in functions to safely read and write MSR registers, i.e., \texttt{wrms\_safe} and \texttt{rdmsr\_safe}; these raise exceptions if something goes wrong in accessing the registers, avoiding critical problems to happen at kernel level.
+
+We then implemented our own \gls{CLI} tools to access these hypercalls from Dom0: \texttt{xempower\_RaplSetPower} to set and \texttt{xempower\_RaplPowerMonitor} to read the power consumption of the socket. Arguments (e.g., the desired value of power cap and the power consumption measured) are passed through the whole stack using a set of buffers that allow a fast and secure communication between different hierarchical protection domains \cite{os-rings} (i.e. ring0 for Xen and ring3 for Dom0).
+The \gls{CLI} tools are in charge of performing some checks on the input parameters, as well as of instantiating and invoking the Xen command interface to launch the hypercalls.
+
+
+
+
+%\fixme{riscrivere meglio} PUPiL exploits RAPL in order to achieve timeliness. At the beginning of the monitoring process RAPL is settled. In this way the cap is rapidly respected. The drawbacks of this initial phase are the performance since RAPL cut the power obliviously, not taking into account the performance of the application. On the other face of the coin this strict behaviour allows to maintain the cap respected during all the execution time of the applications.
+%\fixme{riscrivere meglio} In PUPiL all the resources are managed during the "act" step via system call provided by the OS. In order to accomplish the same result we had to map these syscalls to Xen privileged hypercalls accessible from dom0.
+%This calls are provided to dom0 using the xl specific command. For example to assign
+%to a domain a specific number of CPU we use the CPU-pool technique with the APIs provideded by Xen. In particular when an user domain is created a corresponding pool is created too and an unused CPU is assigned to that pool. If the decision phase output is to change the number of CPU for that specific domain then they are removed (or added) via xl command. This of course meant a deep change in PUPiL code and data structures.
+
+
+%\fixme{riscrivere meglio} In order to setting RAPL we need to obtain access to the MSR register, but Xen doesn't expose them to dom0. But as we said, from dom0 is possble to launch hypercall, that are managed directly from the hypervisor that has direct access to the hardware. Following this idea we implemented a set of hypercalls that give the opportunity to read and write MSR register. Digging in the Xen core and taking inspiration by other implemented hypercalls in Xen we started from the bottom. First of all we declared our hypercalls in the asm entry table that keep track of all the hypercall in Xen, by specifying the name and the id of our hypercalls and their numeber of arguments. Then we defined constants for our new hypercalls in Xen header file, numbering them sequentially and inserting them before the HYPERVISOR-xc-reserved-op. After this in the kernel of xen we declared the body of our hypercalls. Here we used safe function provided by Xen in order to read and write MSR register. In this way the hypervisor is now ready to accomodate the hypercall coming from dom0. In order to allow dom0 to use this hypercall we exploit the PrivCmd driver provided by Xen. In the xc-private.h we defined our function to bake and deliver the hypercall with the parameters passed by dom0. As last step we create a Xen control tools usable from dom0 that calls the baking functions. 
+%Following the described work-flow we declared one hypercall for writing PKG-RAPL-POWER-LIMIT registers. In this tool firstly we read the the RAPL-POWER-UNIT register in order to get the system metrics and then we use them to transforms the given power cap in RAPL power units to be written in the PKG-RAPL-POWER-LIMIT register.
+%To read power consumption stored in the PKG-RAPL-POWER-INFO we had to have a returned value from the hypervisor, the content of the register. Since the program memory mapping is different from the tool to the hypercall manager (i.e. one is in user space, the other one is in kernel space) a variable passed by reference used to store the result is useless. So we decided to exploit a system of buffers mapped to shared memory in order to obtain a mechanism similar to the passing by reference one. In this way we were able to pass a value from the kernel to the tool and so to dom0.
+
+
+\subsubsection{Software resource management}
+The current implementation of \xempupil makes use of two tools provided by the Xen hypervisor to tune the performance and assign resources to domains.
+
+The first one is the \emph{cpupool} tool: this is part of the Xen \emph{xl} \gls{CLI} and allows to cluster the physical CPUs in different pools. Once a pool is declared, it is possible to create a domain that uses that pool: the scheduler will then schedule the domain's virtual CPUs only on the physical CPUs that are part of that cluster. Our approach makes use of this tool to assign more physical resources (i.e., CPU cores) to a domain at runtime: as a new resource allocation is chosen by the \emph{decide} phase, we increase or decrease the number of CPUs in the pool and pin the domain's virtual CPUs to these, to increase workload stability.
+
+The second tool exploited is \emph{xenpm}: this allows to set a maximum and minimum frequency for each physical CPU. Again, \xempupil uses this to actuate CPU frequencies as the \emph{decision} phase requires it.
+
+\note{questo era stato tagliato, rimettere se serve: "the domain itself still believes to have the same amount of virtual CPUs, that we set to the maximum number of physical CPUs available; then, the hypervisor may assign it a smaller amount of physical ones, potentially causing more virtual CPUs to be time-multiplexed on the same core (if this is the outcome of the decision phase)."}
+
+
+
+
+
+
+
+
+
+%\note{riscrivere meglio, raccontando come funziona il discorso delle CPU pool} A performance tuning via software technique is exploited in order to achieve efficiency. This part of the monitoring process is slower than the hardware one and also is less precise in respecting the cap, but these are not real issues since the time needed to tune the performance of the system was previously gained by the reactivity of the hardware part and the strictness of the cap is always granted by RAPL. The tuning allows the applications to maximize their performance under the power cap. This is made by assigning to them the resources needed, e.g.: number of cores, frequency of the cores, memory controllers and so on. In this way a memory intensive workload will run on less core than a CPU intensive one. The tuning rationale is based on the metrics provided by the HeartBeat library developed by the MIT Carbon group, that provides information about the application behaviour.
+
+
+%\subsection{Sharing memory in Xen}
+%To share HeartBeat log files between the different running user domains and the dom0 (where these information are requested) we decided to use a simply but efficient technique. Since dom0 needs the log in reading priviledge we decided to create an LVM partition. This partition is then mounted on boot by dom0 and all the other domains on a folder. In this way we have a piece of memory shared by dom0 and all the domains and since the files are written in just one direction, the file system can remain standard, like ext4. In this way we avoided the overhead due to a communication that exploits the network and has to pass through the network protocols.

@@ -1,0 +1,7 @@
+Towards a performance-aware power capping orchestrator for the Xen hypervisor
+
+In the era of Cloud Computing, services and computational power are provided in an “as-a-service” fashion, reducing the need of buying, building and maintaining proprietary systems. However, the burden of costs optimization is left to the Cloud Provider, that still faces the problem of consolidating multiple workloads on the same infrastructure. As power consumption remains one of the most impacting costs on a multi-tenant server infrastructure, several approaches have been explored in literature to cope with power caps, trying to maximize the performance of the system. In this paper, we present some preliminary results and opportunities towards a performance-aware power capping orchestrator for the Xen hypervisor. The proposed solution, called XeMPUPiL, uses of the Intel Running Average Power Limit (RAPL) hardware interface to set a strict limit on the processor’s power consumption, while a software-level Observe-Decide-Act (ODA) loop performs an exploration of the available resource allocations to find the most power efficient one for the running workload. We show how XeMPUPiL is able to achieve higher performances under different power caps for almost all the different classes of benchmarks analyzed (e.g., CPU-, memory- and IO-bound).
+
+Marco Arnaboldi, Matteo Ferroni, Marco Domenico Santambrogio
+
+marco1.arnaboldi@mail.polimi.it, matteo.ferroni@polimi.it, marco.santambrogio@polimi.it
