@@ -22,7 +22,7 @@ class DiffManager extends Actor {
 
         x._2.foreach(y => {
 
-          generator.addSample(x._1._1,x._1._2,y.oldStartingLine,y.oldEndingLine,y.newStartingLine,y.newEndingLine)
+          generator.addSample(repoId.toString,x._1._1,x._1._2,y.oldStartingLine,y.oldEndingLine,y.newStartingLine,y.newEndingLine)
         })
       })
 
