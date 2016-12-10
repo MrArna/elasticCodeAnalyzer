@@ -24,7 +24,7 @@ class ProjectDownloaderTest extends TestKit(ActorSystem("DownloadTest",ConfigFac
         val actorRef = TestActorRef[ProjectDownloader]
 
 
-        actorRef ? Start(1, "Java") onSuccess {
+        actorRef ? Start(1, "Java",0) onSuccess {
           case GetIssue(id, title, body, commit) =>
             println(id + " " + title + " " + body + " " + commit)
             expectMsgClass(classOf[GetIssue])

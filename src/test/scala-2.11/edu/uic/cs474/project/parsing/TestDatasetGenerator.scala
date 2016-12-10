@@ -1,5 +1,7 @@
 package edu.uic.cs474.project.parsing
 
+import java.io.File
+
 import org.scalatest.FunSuite
 
 import scala.io.Source
@@ -11,12 +13,15 @@ class TestDatasetGenerator extends FunSuite {
 
   test("Test DatasetGenerator 1") {
 
+    val f = new File("files/test/dataset")
+    if(f.exists()) f.delete()
+
     val dg = new DatasetGenerator
 
-    dg.addSample("files/test/simple.java","files/test/simple.java",3,4,3,4)
-    dg.addSample("files/test/simple.java","files/test/simple.java",3,4,3,4)
+    dg.addSample("repo0","files/test/simple.java","files/test/simple.java",3,4,3,4)
+    dg.addSample("repo0","files/test/simple.java","files/test/simple.java",3,4,3,4)
     dg.saveDataset("files/test/dataset")
-    dg.addSample("files/test/simple.java","files/test/simple.java",3,4,3,4)
+    dg.addSample("repo0","files/test/simple.java","files/test/simple.java",3,4,3,4)
     dg.saveDataset("files/test/dataset")
 
     val lines = Source.fromFile("files/test/dataset").getLines()

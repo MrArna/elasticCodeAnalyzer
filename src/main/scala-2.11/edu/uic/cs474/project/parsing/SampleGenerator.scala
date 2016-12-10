@@ -13,7 +13,7 @@ import scala.collection.mutable.HashMap
   * @param afterStart The starting char of the changed region in the changed file.
   * @param afterEnd The ending char of the changed region in the changed file.
   */
-class SampleGenerator(before:CompilationUnit,beforeStart:Int,beforeEnd:Int,after:CompilationUnit,afterStart:Int,afterEnd:Int) {
+class SampleGenerator(repoID:String,before:CompilationUnit,beforeStart:Int,beforeEnd:Int,after:CompilationUnit,afterStart:Int,afterEnd:Int) {
 
   /**
     * Generate the sample.
@@ -21,7 +21,7 @@ class SampleGenerator(before:CompilationUnit,beforeStart:Int,beforeEnd:Int,after
     */
   def generate() : String = {
 
-    var sample = ""
+    var sample = repoID + ","
 
     val beforeVisitor = new CodeVisitor(beforeStart,beforeEnd)
     before.accept(beforeVisitor)
@@ -89,7 +89,7 @@ object SampleGenerator {
   //Generate the CSV file header with feature names
   def getHeader() : String = {
 
-    var header = ""
+    var header = "RepositoryID,"
 
     SampleGenerator.names.foreach(name => {
 
