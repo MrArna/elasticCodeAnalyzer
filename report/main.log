@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  9 DEC 2016 15:25
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 DEC 2016 12:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -481,9 +481,23 @@ LaTeX Font Info:    Try loading font information for U+lasy on input line 132.
 (/usr/local/texlive/2012/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-(./sections/Introduction.tex) (./sections/Implementation.tex)
-(./sections/Experimental-results.tex) (./sections/Limitations.tex)
-(./sections/Conclusions.tex)
+(./sections/Introduction.tex) (./sections/Implementation.tex
+<pictures/overallArch.pdf, id=1, 568.1225pt x 399.4925pt>
+File: pictures/overallArch.pdf Graphic file (type pdf)
+
+<use pictures/overallArch.pdf>
+Package pdftex.def Info: pictures/overallArch.pdf used on input line 6.
+(pdftex.def)             Requested size: 252.0pt x 177.20364pt.
+
+Overfull \hbox (12.0pt too wide) in paragraph at lines 6--7
+ [][] 
+ []
+
+[1{/usr/local/texlive/2012/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+
+
+ <./pictures/overallArch.pdf>]) (./sections/Experimental-results.tex)
+(./sections/Limitations.tex) (./sections/Conclusions.tex)
 
 Package glossaries Warning: \makeglossaries hasn't been used,
 the glossaries will not be updated.
@@ -492,32 +506,29 @@ the glossaries will not be updated.
 Package glossaries Warning: No \printglossary or \printglossaries found.
 This document will not have a glossary.
 
-
-Overfull \vbox (149.0pt too high) has occurred while \output is active []
-
- [1{/usr/local/texlive/2012/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
-
+[2
 
 ] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 5801 strings out of 493488
- 79931 string characters out of 3141326
- 164849 words of memory out of 3000000
- 8943 multiletter control sequences out of 15000+200000
- 45059 words of font info for 62 fonts, out of 3000000 for 9000
+ 5816 strings out of 493488
+ 80141 string characters out of 3141326
+ 171857 words of memory out of 3000000
+ 8950 multiletter control sequences out of 15000+200000
+ 48207 words of font info for 68 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 41i,11n,35p,1424b,317s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 41i,11n,35p,2112b,317s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2012/texmf-dist/fonts/enc/dvips/base/8r.enc
-}</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></
-usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr
-/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/l
-ocal/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/te
-xlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2
-012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
-Output written on main.pdf (1 page, 56839 bytes).
+}</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><
+/usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></us
+r/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/l
+ocal/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/loc
+al/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texl
+ive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/201
+2/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
+Output written on main.pdf (2 pages, 391550 bytes).
 PDF statistics:
- 33 PDF objects out of 1000 (max. 8388607)
- 23 compressed objects within 1 object stream
+ 114 PDF objects out of 1000 (max. 8388607)
+ 71 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
