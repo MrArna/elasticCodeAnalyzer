@@ -23,7 +23,7 @@ class DatasetGenerator {
     * @param afterStartLine The line where the modification starts in the changed file.
     * @param afterEndLine The line where the modification ends in the changed file.
     */
-  def addSample(beforePath:String,afterPath:String,beforeStartLine:Int,beforeEndLine:Int,afterStartLine:Int,afterEndLine:Int): Unit = {
+  def addSample(repoID:String,beforePath:String,afterPath:String,beforeStartLine:Int,beforeEndLine:Int,afterStartLine:Int,afterEndLine:Int): Unit = {
 
     val beforeParser = new CodeParser(beforePath,beforeStartLine,beforeEndLine)
     val beforeTuple = beforeParser.parse()
@@ -31,7 +31,7 @@ class DatasetGenerator {
     val afterParser = new CodeParser(afterPath,afterStartLine,afterEndLine)
     val afterTuple = afterParser.parse()
 
-    val generator = new SampleGenerator(beforeTuple._1,beforeTuple._2,beforeTuple._3,afterTuple._1,afterTuple._2,afterTuple._3)
+    val generator = new SampleGenerator(repoID,beforeTuple._1,beforeTuple._2,beforeTuple._3,afterTuple._1,afterTuple._2,afterTuple._3)
     samples += generator.generate()
   }
 

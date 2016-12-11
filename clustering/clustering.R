@@ -1,8 +1,14 @@
+library("NMF")
+
 #Clear environment
 rm(list=ls())
 
 #Read dataset
 dataset = read.csv("/home/andrea/Downloads/dataset.csv")
+
+#Save repoID
+repoID = dataset$RepositoryID
+dataset$RepositoryID = NULL
 
 #Get number of rows and columns
 nrows = nrow(dataset)
@@ -19,9 +25,10 @@ ids = which(sums==0)
 
 #Get the filtered dataset
 dataset_filtered = dataset[-ids,]
+repoID = repoID[-ids]
 
 #Remove duplicated samples
-dataset_filtered = unique(dataset_filtered)
+#dataset_filtered = unique(dataset_filtered)
 
 #Define the cosine similarity
 cosineSimilarity = function(a,b) 
@@ -39,7 +46,7 @@ for(i in c(1:n)) {
       D[i,j] = cosineSimilarity(as.numeric(dataset_filtered[i,]),as.numeric(dataset_filtered[j,]))
     }
   }
-  print(i)
+  print(paste(i/n*100,"%"))
 }
 
 #Compute dist vector
@@ -48,3 +55,11 @@ D = as.dist(D)
 #Apply hierarchical clustering
 clusters = hclust(D)
 plot(clusters)
+
+#Get clusters
+groups = cutree(clusters,k=30)
+
+#Compute purity
+purity(as.factor(groups),as.factor(repoID))
+#Compute entropy
+entropy(as.factor(groups),as.factor(repoID))
