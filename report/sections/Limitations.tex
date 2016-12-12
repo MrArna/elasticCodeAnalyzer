@@ -1,3 +1,4 @@
 \section{Limitations}
 \label{sec:limitations}
 
+Our current approach has several limitations. First, we are considering only Java projects. However, our code is easily extensible to support other languages. Second, we can generated only small datasets due to the restrictions imposed by GitHub on API calls. Our current solution is to run the system multiple times, waiting the necessary time between runs, to collect more samples. Our main limitation is that we are not able to exploit bug reports as we were expecting. The majority of bug reports on GitHub are poorly written and the application of some text mining algorithm on them would lead to very bad results. Thus, at the moment we lack a method to evaluate our clusters in a meaningful way. Our last limitation is that we are considering only a simple feature set. However, our code can be easily extended to include much more complicated features, even those representing dependencies between code constructs.
