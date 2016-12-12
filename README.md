@@ -1,29 +1,16 @@
-# README #
+# CS474 - Project
 
-This README would normally document whatever steps are necessary to get your application up and running.
+##Intro
+This is the README for the UIC CS474 class, Fall 2016. 
 
-### What is this repository for? ###
+## How to run the code
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Run from SBT by executing `sbt run`. 
 
-### How do I get set up? ###
+## How to run the tests
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Run from SBT by executing `sbt test`. 
 
-### Contribution guidelines ###
+##Design and implementation
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+For all the details about our design and implementation, please refer to the report `main.pdf` in folder report.
