@@ -1,4 +1,4 @@
-##### ELASTIC CODE ANALYZER
+## ELASTIC CODE ANALYZER
 
 ## Intro
 This is the README for the UIC CS474 class, Fall 2016. 
